@@ -14,7 +14,30 @@ const getWeatherFromApi = async () => {
     return weather;
   };
 
-
+  const getWeatherForecast = async (city) => {
+    const getLatLong = () => {
+      switch (city) {
+        case "Helsinki":
+          return { lat: 60.19, lon: 24.94 };
+        case "Tampere":
+          return { lat: 61.5, lon: 23.79 };
+        case "Turku":
+          return { lat: 60.45, lon: 22.27 };
+        case "Oulu":
+          return { lat: 65.01, lon: 25.47 };
+        default:
+          throw new Error("Unknown city");
+      }
+    };
+    const { lat, lon } = getLatLong();
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&exclude=minutely,hourly&appid=${process.env.REACT_APP_API_KEY}`
+    );
+    const data = await response.json();
+    const dailyForecast = data.daily;
+    console.log(dailyForecast[0].weather[0]);
+    return dailyForecast;
+  };
 
 const Weather = () => {
 
@@ -32,9 +55,19 @@ const Weather = () => {
       fetchData();
     }, []); 
   
-    const handleClick = (key) => {
+    const handleClick = ({key}) => {
 
       setCity(key)
+      async function fetchData() {
+        const response = await getWeatherForecast(key);
+        console.log(response[0].weather[0]);
+        
+        setWeatherData(response[0].weather[0])
+      }
+      fetchData();
+    //   console.log(key)
+    //   console.log(getWeatherForecast(key))
+    //   setWeatherData(getWeatherForecast(key))
   
       
   
@@ -61,7 +94,7 @@ const Weather = () => {
       </div>
       </Dropdown>
       <Divider />
-      <Typography.Title>Current Weather for: {city} </Typography.Title>
+      <Typography.Title>Current Weather </Typography.Title>
       <WeatherDataSection city={city} weatherData={weatherData} />
       </div>
     );
