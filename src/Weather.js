@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Typography, Menu, Dropdown, Divider  } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import { WeatherDataSection } from "./WeatherDataSection";
+import { DatePicker } from 'antd';
 
 const getWeatherFromApi = async () => {
     const response = await fetch(
@@ -62,7 +63,6 @@ const Weather = () => {
       <Divider />
       <Typography.Title>Current Weather for: {city} </Typography.Title>
       <WeatherDataSection city={city} weatherData={weatherData} />
-  
       </div>
     );
   };
