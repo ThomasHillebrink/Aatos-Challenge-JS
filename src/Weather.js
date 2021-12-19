@@ -4,6 +4,7 @@ import { Typography, Menu, Dropdown, Divider  } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import { WeatherDataSection } from "./WeatherDataSection";
 import { SunriseSunsetSection } from "./SunriseSunsetSection";
+import { WeatherForecast } from "./WeatherForecast";
 import { format, intervalToDuration } from 'date-fns'
 
 const getWeatherFromApi = async () => {
@@ -44,29 +45,38 @@ const Weather = () => {
 
     const [weatherData, setWeatherData] = React.useState({});
     const [city, setCity] = React.useState("Helsinki");
+
     const [SunRise, setSunRise] = React.useState();
     const [SunSet, setSunSet] = React.useState();
     const [SunTime, setSunTime] = React.useState({});
+
+    const [AverageTemp, setAverageTemp] = React.useState();
+    const [MinTemp, setMinTemp] = React.useState();
+    const [MaxTemp, setMaxTemp] = React.useState();
 
   
     
     useEffect(() => {
       async function fetchData() {
         const Weatherresponse = await getWeatherFromApi();
-        const SunResponse = await getWeatherForecast("Helsinki")
+        const DayResponse = await getWeatherForecast("Helsinki")
         console.log(Weatherresponse);
-        CalculateSunTimes(SunResponse)
+        console.log(DayResponse)
+
+        CalculateSunTimes(DayResponse)
+        CaluclateTemperatures(DayResponse)
+
         setWeatherData(Weatherresponse)
       }
       fetchData();
     }, []); 
 
-    const CalculateSunTimes = (SunResponse) => {
-        const SunRise = SunResponse[0].sunrise * 1000
+    const CalculateSunTimes = (DayResponse) => {
+        const SunRise = DayResponse[0].sunrise * 1000
         console.log(format(SunRise, 'HH:mm'));
         setSunRise(format(SunRise, 'HH:mm'))
 
-        const SunSet = SunResponse[0].sunset * 1000
+        const SunSet = DayResponse[0].sunset * 1000
         console.log(format(SunSet, 'HH:mm'));
         setSunSet(format(SunSet, 'HH:mm'))
 
@@ -74,6 +84,23 @@ const Weather = () => {
             start: new Date(SunRise),
              end: new Date(SunSet)
           }));
+    }
+
+    const CaluclateTemperatures = (DayResponse) => {
+        console.log(DayResponse);
+        const TemperaturesArray = DayResponse.map((day) => {
+            return day.temp.day;
+        })
+
+        const TemperaturesAvg = TemperaturesArray.reduce((a,b) => a + b, 0) / TemperaturesArray.length
+        setAverageTemp(TemperaturesAvg.toFixed(1));
+
+        const TemperaturesMin =  Math.min(...TemperaturesArray);
+        setMinTemp(TemperaturesMin.toFixed(1));
+
+        const TemperaturesMax =  Math.max(...TemperaturesArray);
+        setMaxTemp(TemperaturesMax.toFixed(1))
+
     }
   
     const handleClick = ({key}) => {
@@ -83,9 +110,10 @@ const Weather = () => {
         const Weatherresponse = await getWeatherForecast(key);
         console.log(Weatherresponse[0].weather[0]);
 
-        const SunResponse = await getWeatherForecast(key)
-        console.log(SunResponse);
-        CalculateSunTimes(SunResponse)
+        const DayResponse = await getWeatherForecast(key)
+        console.log(DayResponse);
+        CalculateSunTimes(DayResponse)
+        CaluclateTemperatures(DayResponse)
         
         setWeatherData(Weatherresponse[0].weather[0])
       }
@@ -121,6 +149,11 @@ const Weather = () => {
         SunRise={SunRise}
         SunSet={SunSet}
         SunTime={SunTime}
+        />
+        <WeatherForecast
+        AverageTemp={AverageTemp}
+        MinTemp={MinTemp}
+        MaxTemp={MaxTemp}
         />
       </div>
     );

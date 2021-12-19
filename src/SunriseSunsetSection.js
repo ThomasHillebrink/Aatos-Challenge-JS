@@ -1,5 +1,4 @@
 import React from "react";
-import { Typography, Row, Col } from "antd";
 
 export const SunriseSunsetSection = ({SunRise, SunSet, SunTime}) => {
 
