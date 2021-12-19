@@ -37,7 +37,6 @@ const getWeatherFromApi = async () => {
     );
     const data = await response.json();
     const dailyForecast = data.daily;
-    console.log(dailyForecast[0].weather[0]);
     return dailyForecast;
   };
 
@@ -60,8 +59,6 @@ const Weather = () => {
       async function fetchData() {
         const Weatherresponse = await getWeatherFromApi();
         const DayResponse = await getWeatherForecast("Helsinki")
-        console.log(Weatherresponse);
-        console.log(DayResponse)
 
         CalculateSunTimes(DayResponse)
         CaluclateTemperatures(DayResponse)
@@ -73,11 +70,9 @@ const Weather = () => {
 
     const CalculateSunTimes = (DayResponse) => {
         const SunRise = DayResponse[0].sunrise * 1000
-        console.log(format(SunRise, 'HH:mm'));
         setSunRise(format(SunRise, 'HH:mm'))
 
         const SunSet = DayResponse[0].sunset * 1000
-        console.log(format(SunSet, 'HH:mm'));
         setSunSet(format(SunSet, 'HH:mm'))
 
         setSunTime(intervalToDuration({
@@ -87,7 +82,7 @@ const Weather = () => {
     }
 
     const CaluclateTemperatures = (DayResponse) => {
-        console.log(DayResponse);
+
         const TemperaturesArray = DayResponse.map((day) => {
             return day.temp.day;
         })
@@ -108,18 +103,14 @@ const Weather = () => {
       setCity(key)
       async function fetchData() {
         const Weatherresponse = await getWeatherForecast(key);
-        console.log(Weatherresponse[0].weather[0]);
-
         const DayResponse = await getWeatherForecast(key)
-        console.log(DayResponse);
+
         CalculateSunTimes(DayResponse)
         CaluclateTemperatures(DayResponse)
-        
         setWeatherData(Weatherresponse[0].weather[0])
       }
       fetchData();
       
-  
     }
   
     const menu = (
