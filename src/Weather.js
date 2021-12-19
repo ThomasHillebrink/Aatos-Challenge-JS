@@ -3,7 +3,8 @@ import React, { useEffect } from "react";
 import { Typography, Menu, Dropdown, Divider  } from "antd";
 import { DownOutlined } from '@ant-design/icons';
 import { WeatherDataSection } from "./WeatherDataSection";
-import { DatePicker } from 'antd';
+import { SunriseSunsetSection } from "./SunriseSunsetSection";
+import { format, intervalToDuration } from 'date-fns'
 
 const getWeatherFromApi = async () => {
     const response = await fetch(
@@ -43,32 +44,52 @@ const Weather = () => {
 
     const [weatherData, setWeatherData] = React.useState({});
     const [city, setCity] = React.useState("Helsinki");
+    const [SunRise, setSunRise] = React.useState();
+    const [SunSet, setSunSet] = React.useState();
+    const [SunTime, setSunTime] = React.useState({});
+
   
     
     useEffect(() => {
       async function fetchData() {
-        const response = await getWeatherFromApi();
-        console.log(response);
-        
-        setWeatherData(response)
+        const Weatherresponse = await getWeatherFromApi();
+        const SunResponse = await getWeatherForecast("Helsinki")
+        console.log(Weatherresponse);
+        CalculateSunTimes(SunResponse)
+        setWeatherData(Weatherresponse)
       }
       fetchData();
     }, []); 
+
+    const CalculateSunTimes = (SunResponse) => {
+        const SunRise = SunResponse[0].sunrise * 1000
+        console.log(format(SunRise, 'HH:mm'));
+        setSunRise(format(SunRise, 'HH:mm'))
+
+        const SunSet = SunResponse[0].sunset * 1000
+        console.log(format(SunSet, 'HH:mm'));
+        setSunSet(format(SunSet, 'HH:mm'))
+
+        setSunTime(intervalToDuration({
+            start: new Date(SunRise),
+             end: new Date(SunSet)
+          }));
+    }
   
     const handleClick = ({key}) => {
 
       setCity(key)
       async function fetchData() {
-        const response = await getWeatherForecast(key);
-        console.log(response[0].weather[0]);
+        const Weatherresponse = await getWeatherForecast(key);
+        console.log(Weatherresponse[0].weather[0]);
+
+        const SunResponse = await getWeatherForecast(key)
+        console.log(SunResponse);
+        CalculateSunTimes(SunResponse)
         
-        setWeatherData(response[0].weather[0])
+        setWeatherData(Weatherresponse[0].weather[0])
       }
       fetchData();
-    //   console.log(key)
-    //   console.log(getWeatherForecast(key))
-    //   setWeatherData(getWeatherForecast(key))
-  
       
   
     }
@@ -96,6 +117,11 @@ const Weather = () => {
       <Divider />
       <Typography.Title>Current Weather </Typography.Title>
       <WeatherDataSection city={city} weatherData={weatherData} />
+      <SunriseSunsetSection 
+        SunRise={SunRise}
+        SunSet={SunSet}
+        SunTime={SunTime}
+        />
       </div>
     );
   };
