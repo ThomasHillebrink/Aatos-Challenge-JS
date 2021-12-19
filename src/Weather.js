@@ -2,9 +2,7 @@ import "./Weather.css";
 import React, { useEffect } from "react";
 import { Typography, Menu, Dropdown, Divider  } from "antd";
 import { DownOutlined } from '@ant-design/icons';
-import { Row, Col } from "antd";
-
-// import { WeatherDataSection } from "./WeatherDataSection";
+import { WeatherDataSection } from "./WeatherDataSection";
 
 const getWeatherFromApi = async () => {
     const response = await fetch(
@@ -15,27 +13,6 @@ const getWeatherFromApi = async () => {
     return weather;
   };
 
-  const WeatherDataSection = () => (
-    props
-  ) => {
-    const { weatherData } = props;
-    const iconUrl = `http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`;
-  
-    return (
-      <div>
-        <Row>
-          <Col span={12}>
-            <img src={iconUrl} className="Weather-logo" alt="logo" />
-          </Col>
-  
-          <Col span={12}>
-            <Typography.Title level={2}>{weatherData.main}</Typography.Title>
-            <Typography.Text>{weatherData.description}</Typography.Text>
-          </Col>
-        </Row>
-      </div>
-    );
-  };
 
 
 const Weather = () => {
